@@ -51,9 +51,14 @@ A platform for conducting oral exams using AI. Teachers create tests with questi
 - **OpenAI SDK** — LLM and TTS plugins for LiveKit Agents
 - **livekit-client** — WebRTC client for the browser
 
+### Development process
+
+- [PROMPTS.md](PROMPTS.md) — full prompt documentation and multi-agent flow
+- [conversation.md](conversation.md) — transcript of the Claude Code session used to build this project
+
 ### Built by us
 
-**Agent (Python):** — see [PROMPTS.md](PROMPTS.md) for full prompt documentation and multi-agent flow
+**Agent (Python):**
 - `agent/agent.py` — ExamAgent: exam flow logic, tool calls for scoring, graceful shutdown with post-speech callback
 - `agent/sub_agents.py` — Guard (detects student manipulation attempts) and Grader (independent answer evaluation)
 - Multi-agent architecture: Examiner leads the conversation, Guard filters input, Grader scores independently
