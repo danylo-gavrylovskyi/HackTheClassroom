@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Test } from "@/app/types";
 import { deleteExam } from "@/app/lib/api";
+import ResultsModal from "./ResultsModal";
 
 interface TestCardProps {
   test: Test;
@@ -13,6 +14,7 @@ export default function TestCard({ test, onDelete }: TestCardProps) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showResults, setShowResults] = useState(false);
 
   const examLink = typeof window !== "undefined"
     ? `${window.location.origin}/exam/${test.id}`
@@ -62,11 +64,20 @@ export default function TestCard({ test, onDelete }: TestCardProps) {
 
         <div className="flex items-center gap-2 shrink-0">
           <button
+            onClick={() => setShowResults(true)}
+            className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-800 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+            </svg>
+            Результати
+          </button>
+          <button
             onClick={handleCopyLink}
             className="flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-700 px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition-colors"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.86-4.122a4.5 4.5 0 00-1.242-7.244l-4.5-4.5a4.5 4.5 0 00-6.364 6.364L4.34 8.877" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
             </svg>
             {copied ? "Скопійовано!" : "Посилання"}
           </button>
@@ -81,6 +92,14 @@ export default function TestCard({ test, onDelete }: TestCardProps) {
           </button>
         </div>
       </div>
+
+      {showResults && (
+        <ResultsModal
+          examId={test.id}
+          examTitle={test.title}
+          onClose={() => setShowResults(false)}
+        />
+      )}
 
       {showConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">

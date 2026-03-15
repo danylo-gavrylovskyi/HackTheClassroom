@@ -200,7 +200,7 @@ export default function ExamSession() {
                         {/* Name input */}
                         <div className="mb-4">
                             <label className="block text-sm font-medium text-gray-300 mb-1.5">
-                                Ваше ім'я та прізвище
+                                Ваше ім&apos;я та прізвище
                             </label>
                             <input
                                 type="text"
