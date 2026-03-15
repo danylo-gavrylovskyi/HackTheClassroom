@@ -10,6 +10,7 @@ import {
     ConnectionState,
     Track,
     RemoteParticipant,
+    RemoteTrack,
     RemoteTrackPublication,
     ParticipantEvent,
 } from "livekit-client";
@@ -90,19 +91,30 @@ export default function ExamSession() {
             }
         });
 
-        // Detect when agent/remote participant is speaking
+        // Attach remote audio tracks and detect speaking
         room.on(
             RoomEvent.TrackSubscribed,
             (
-                _track: unknown,
+                track: RemoteTrack,
                 publication: RemoteTrackPublication,
                 participant: RemoteParticipant
             ) => {
-                if (publication.kind === Track.Kind.Audio) {
+                if (track.kind === Track.Kind.Audio) {
+                    const el = track.attach();
+                    el.id = `audio-${participant.identity}`;
+                    document.body.appendChild(el);
+
                     participant.on(ParticipantEvent.IsSpeakingChanged, (speaking: boolean) => {
                         setAgentSpeaking(speaking);
                     });
                 }
+            }
+        );
+
+        room.on(
+            RoomEvent.TrackUnsubscribed,
+            (track: RemoteTrack) => {
+                track.detach().forEach((el) => el.remove());
             }
         );
 
@@ -120,8 +132,8 @@ export default function ExamSession() {
             setMicActive(false);
         });
 
-        // Enable microphone (student speaks)
         await room.connect(LIVEKIT_URL, token);
+        await room.startAudio();
         await room.localParticipant.setMicrophoneEnabled(true);
 
         void roomName;

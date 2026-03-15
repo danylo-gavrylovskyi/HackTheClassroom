@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from livekit import agents
 from livekit.agents import AgentSession, Agent, RoomInputOptions, RunContext, function_tool
 
-from livekit.plugins import openai, elevenlabs, deepgram
+from livekit.plugins import openai, deepgram
 
 load_dotenv()
 
@@ -147,14 +147,8 @@ async def entrypoint(ctx: agents.JobContext):
     session = AgentSession(
         stt=deepgram.STT(language="uk"),
         llm=openai.LLM(model="gpt-4o"),
-        tts=elevenlabs.TTS(
-            model="eleven_multilingual_v2",
-            voice=elevenlabs.Voice(
-                id="EXAVITQu4vr4xnSDxMaL",
-                name="Bella",
-                category="premade",
-            ),
-        ),
+        tts=openai.TTS(model="tts-1", voice="nova"),
+        userdata={},
     )
 
     await session.start(
