@@ -1,6 +1,7 @@
 import json
 import logging
 
+import httpx
 from dotenv import load_dotenv
 from livekit import agents
 from livekit.agents import AgentSession, Agent, RoomInputOptions, RunContext, function_tool
@@ -114,17 +115,36 @@ class ExamAgent(Agent):
             total_score: Sum of all individual question scores
             max_total_score: Maximum possible total score
         """
-        context.userdata["summary"] = summary
-        context.userdata["total_score"] = total_score
-        context.userdata["max_total_score"] = max_total_score
-        context.userdata["finished"] = True
-
         scores = context.userdata.get("scores", [])
+        callback_url = context.userdata.get("callback_url")
+        callback_secret = context.userdata.get("callback_secret")
+
         logger.info(
             f"Exam finished: {total_score}/{max_total_score}\n"
             f"Summary: {summary}\n"
             f"Scores: {json.dumps(scores, ensure_ascii=False)}"
         )
+
+        if callback_url and callback_secret:
+            try:
+                async with httpx.AsyncClient() as client:
+                    resp = await client.post(
+                        callback_url,
+                        json={
+                            "scores_json": scores,
+                            "summary_text": summary,
+                            "total_score": total_score,
+                            "max_score": max_total_score,
+                        },
+                        headers={"x-callback-secret": callback_secret},
+                        timeout=10,
+                    )
+                    logger.info(f"Callback response: {resp.status_code}")
+            except Exception as e:
+                logger.error(f"Failed to send results to backend: {e}")
+        else:
+            logger.warning("No callback_url/callback_secret in userdata, results not saved to DB")
+
         return "Іспит завершено. Результати записано. Попрощайся зі студентом."
 
 
@@ -134,6 +154,7 @@ async def entrypoint(ctx: agents.JobContext):
     # Step 3+: read questions from room metadata
     # For now, use hardcoded questions
     questions = HARDCODED_QUESTIONS
+    userdata = {}
     metadata = ctx.room.metadata
     if metadata:
         try:
@@ -141,6 +162,9 @@ async def entrypoint(ctx: agents.JobContext):
             if "questions" in meta:
                 questions = meta["questions"]
                 logger.info(f"Loaded {len(questions)} questions from room metadata")
+            if "callback_url" in meta:
+                userdata["callback_url"] = meta["callback_url"]
+                userdata["callback_secret"] = meta.get("callback_secret", "")
         except json.JSONDecodeError:
             logger.warning("Failed to parse room metadata, using hardcoded questions")
 
@@ -148,7 +172,7 @@ async def entrypoint(ctx: agents.JobContext):
         stt=deepgram.STT(language="uk"),
         llm=openai.LLM(model="gpt-4o"),
         tts=openai.TTS(model="tts-1", voice="nova"),
-        userdata={},
+        userdata=userdata,
     )
 
     await session.start(
