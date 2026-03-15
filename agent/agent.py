@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from livekit import agents
 from livekit.agents import AgentSession, Agent, RoomInputOptions, RunContext, function_tool
 
-from livekit.plugins import openai, elevenlabs
+from livekit.plugins import openai, elevenlabs, deepgram
 
 load_dotenv()
 
@@ -145,10 +145,15 @@ async def entrypoint(ctx: agents.JobContext):
             logger.warning("Failed to parse room metadata, using hardcoded questions")
 
     session = AgentSession(
-        stt=elevenlabs.STT(language="uk"),
+        stt=deepgram.STT(language="uk"),
         llm=openai.LLM(model="gpt-4o"),
         tts=elevenlabs.TTS(
-            model_id="eleven_flash_v2_5",
+            model="eleven_multilingual_v2",
+            voice=elevenlabs.Voice(
+                id="EXAVITQu4vr4xnSDxMaL",
+                name="Bella",
+                category="premade",
+            ),
         ),
     )
 

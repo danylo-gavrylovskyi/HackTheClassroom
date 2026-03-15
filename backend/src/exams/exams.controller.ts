@@ -14,10 +14,23 @@ import { CreateExamDto } from './dto/create-exam.dto';
 import { SupabaseAuthGuard } from '../auth/supabase-auth.guard';
 import * as express from 'express';
 
+/** Public controller — no auth required */
+@Controller('exams')
+export class ExamsPublicController {
+  constructor(private examsService: ExamsService) { }
+
+  /** Returns only title and subject — safe for students */
+  @Get(':id/public')
+  async getPublic(@Param('id') id: string) {
+    const exam = await this.examsService.findOnePublic(id);
+    return { id: exam.id, title: exam.title, subject: exam.subject };
+  }
+}
+
 @Controller('exams')
 @UseGuards(SupabaseAuthGuard)
 export class ExamsController {
-  constructor(private examsService: ExamsService) {}
+  constructor(private examsService: ExamsService) { }
 
   @Post()
   create(@Req() req: express.Request, @Body() dto: CreateExamDto) {
