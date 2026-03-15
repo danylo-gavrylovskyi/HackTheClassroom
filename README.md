@@ -53,7 +53,7 @@ A platform for conducting oral exams using AI. Teachers create tests with questi
 
 ### Built by us
 
-**Agent (Python):**
+**Agent (Python):** — see [PROMPTS.md](PROMPTS.md) for full prompt documentation and multi-agent flow
 - `agent/agent.py` — ExamAgent: exam flow logic, tool calls for scoring, graceful shutdown with post-speech callback
 - `agent/sub_agents.py` — Guard (detects student manipulation attempts) and Grader (independent answer evaluation)
 - Multi-agent architecture: Examiner leads the conversation, Guard filters input, Grader scores independently
