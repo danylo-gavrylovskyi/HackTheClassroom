@@ -199,7 +199,7 @@ export default function ExamSession() {
                         {/* Name input */}
                         <div className="mb-4">
                             <label className="block text-sm font-medium text-gray-300 mb-1.5">
-                                Ваше ім'я та прізвище
+                                Ваше ім&apos;я та прізвище
                             </label>
                             <input
                                 type="text"
@@ -256,7 +256,7 @@ export default function ExamSession() {
                     <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-indigo-500/20 flex items-center justify-center">
                         <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
                     </div>
-                    <p className="text-white font-medium">З'єднання з екзаменатором...</p>
+                    <p className="text-white font-medium">З&apos;єднання з екзаменатором...</p>
                     <p className="text-gray-500 text-sm mt-1">
                         {connectionState === ConnectionState.Connecting
                             ? "Підключення до кімнати"
@@ -385,7 +385,7 @@ export default function ExamSession() {
                 <h2 className="text-2xl font-bold text-white mb-2">Тест завершено!</h2>
                 <p className="text-gray-400 mb-6 leading-relaxed">
                     Дякуємо, {studentName}! Ваші відповіді записані та надіслані вчителю.
-                    Результати з'являться у кабінеті вчителя.
+                    Результати з&apos;являться у кабінеті вчителя.
                 </p>
 
                 <div className="bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 inline-block">
