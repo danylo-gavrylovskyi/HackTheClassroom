@@ -4,5 +4,6 @@ dist/
 .next/
 __pycache__/
 .venv/
+venv/
 *.pyc
 .DS_Store
