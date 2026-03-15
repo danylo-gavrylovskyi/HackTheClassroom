@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 
@@ -72,6 +73,11 @@ class ExamAgent(Agent):
         self._questions = questions
         self._guard_llm = guard_llm
         self._grader_llm = grader_llm
+
+    async def on_enter(self) -> None:
+        self.session.generate_reply(
+            instructions="Привітайся зі студентом і запитай чи готовий він почати іспит."
+        )
 
     async def on_user_turn_completed(
         self, turn_ctx: llm.ChatContext, new_message: llm.ChatMessage
@@ -212,12 +218,12 @@ class ExamAgent(Agent):
         else:
             logger.warning("No callback_url/callback_secret in userdata, results not saved to DB")
 
-        # Shutdown AFTER the entire turn (goodbye speech) finishes.
-        # Can't call shutdown() directly or use wait_for_playout() here (circular wait).
-        # SpeechHandle.add_done_callback fires when the full turn is done.
-        context.speech_handle.add_done_callback(
-            lambda _: context.session.shutdown(drain=True)
-        )
+        # Schedule shutdown after a delay to let the goodbye speech play out.
+        async def _delayed_shutdown():
+            await asyncio.sleep(10)
+            context.session.shutdown(drain=True)
+
+        asyncio.create_task(_delayed_shutdown())
 
         return "Іспит завершено. Результати записано. Попрощайся коротко зі студентом."
 
